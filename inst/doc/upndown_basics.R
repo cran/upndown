@@ -37,12 +37,18 @@ legend('bottomright', legend = c('CIR target estimate and 90% CI',
        
 udest(gorla751x, gorla751y, target = 0.5)
 
-## ----gorla6_3-----------------------------------------------------------------
+## ----gorla6_3a----------------------------------------------------------------
 # Note the manual addition of "dose n+1"
-reversmean(c(gorla751x, 41), gorla751y, rstart = 1, all = TRUE)
+reversmean(c(gorla751x, 41), gorla751y, rstart = 1, all = TRUE, conf = NULL)
+
+## ----gorla6_3b----------------------------------------------------------------
+# Note the manual addition of "dose n+1"
+reversmean(c(gorla751x, 41), gorla751y, rstart = 1, all = TRUE, 
+                                   target = 0.5, design = krow, desArgs = list(k=1) )
+
 
 ## ----gorla6_4, width = 100----------------------------------------------------
-udest(x=gorla751x, y=gorla751y, target = 0.05, balancePt=.5)
+udest(x = gorla751x, y = gorla751y, target = 0.05, balancePt = .5)
 
 ## ----gorla9_1, fig.width=13, fig.height=7, out.width=1300, out.height=700, echo = -1----
 # Saving current settings as now required by the CRAN powers-that-be :0

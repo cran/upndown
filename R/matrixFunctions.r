@@ -23,8 +23,9 @@
 #' @param target the design's target response rate (`bcdmat()` only).
 #' @param k the number of consecutive identical responses required for dose transitions (k-in-a-row functions only).
 #' @param lowTarget logical k-in-a-row functions only: is the design targeting below-median percentiles, with \eqn{k} repeated negative responses needed to level up and only one to level down - or vice versa? Default `FALSE`. See "Details" for more information.
-#' @param fluffup logical (`kmatFull` only): in the full k-in-a-row internal-state representation, should we *"fluff"* the matrix up so that it has \eqn{Mk} rows and columns (`TRUE`, default), or exclude \eqn{k-1} "phantom" states near one of the boundaries?
-#' @param cohort,lower,upper `gudmat` only: the cohort (group) size, how many positive responses are allowed for a move upward, and how many are required for a move downward, respectively. For example `cohort=3, lower=0, upper=2` evaluates groups of 3 observations at a time, moves up if none are positive, down if \eqn{>=2} are positive, and repeats the same dose with 1 positive.
+#' @param fluffup logical (`kmatFull` only): in the full k-in-a-row internal-state representation, should we *"fluff"* the matrix up so that it has \eqn{Mk} rows and columns (`TRUE`), or exclude \eqn{k-1} "phantom" states near the less-likely-to-be-visited boundary (`FALSE`, default)?
+#' @param cohort `gudmat` only: the cohort (group) size
+#' @param lower,upper (`gudmat` only) how many positive responses are allowed for a move upward, and how many are required for a move downward, respectively. For example `cohort=3, lower=0, upper=2` evaluates groups of 3 observations at a time, moves up if none are positive, down if \eqn{>=2} are positive, and repeats the same dose with 1 positive.
 
 #' @return An \eqn{M\times M} transition probability matrix, except for `kmatFull()` with \eqn{k>1} which returns a larger square matrix. 
 
@@ -171,8 +172,8 @@ validUDinput(cdf, target)
 # A bit more validation/prep:
 if(k==1) fluffup = FALSE # fluffup is irrelevant w/k=1
 
-m=length(cdf)
-mm=(m-1)*k+1
+m=length(cdf) # number of dose levels
+mm=(m-1)*k+1 # number of distinct Markov states
 omat=matrix(0,nrow=mm,ncol=mm)
 
 # Note: code already designed to include boundary conditions without explicit exceptions
@@ -180,17 +181,19 @@ omat=matrix(0,nrow=mm,ncol=mm)
 if(target<=0.5)
 {
 # Down moves
-	omat[cbind(1:mm,rep(c(1,k*(1:(m-1))-k+1),each=k)[1:mm])]=rep(cdf,each=k)[1:mm]
+	omat[cbind(1:mm, rep(c(1, k*(1:(m-1) )-k+1 ),each=k )[1:mm]) ] = 
+	  rep(cdf,each=k)[1:mm]
 # Up moves
 	omat[cbind(1:mm,c(2:mm,mm))]=rep(1-cdf,each=k)[1:mm]
 	
-# Optionally dding "semi-dummy" rows+columns 
+# Optionally adding "semi-dummy" rows+columns 
 #   to get a "nicer" m*k square matrix
 
-	if(fluffup)
-	{
+  if(fluffup)
+  {
 	  mm = m * k
 	  d = nrow(omat) - 1 # shorthand for the m-1 levels we won't touch
+# Adding rows and columns of (initially) zeros
 	  omat = rbind(omat[1:d, 1:d], matrix(0, nrow = k, ncol = d))
 	  omat = cbind(omat, matrix(0, nrow = d+k, ncol = k))
 # Down moves
@@ -201,10 +204,12 @@ if(target<=0.5)
 	  omat[ cbind( (d+1):mm,c((d+2):mm,mm) ) ] = 1 - cdf[m]
 	}                           # end fluffup; no 'else' for this one
 
+	
 } else {       #  target > 0.5
 
 # Up moves
-	omat[cbind(1:mm,c(k+1,rep(k*c(2:(m-1),m-1)+1,each=k)))]=c(1-cdf[1],rep(1-cdf[-1],each=k))
+	omat[cbind(1:mm,c(k+1,rep(k*c(2:(m-1), m-1) + 1, each=k) ) ) ] = 
+	    c(1-cdf[1],rep(1-cdf[-1],each=k) )
 # Down moves
 	omat[cbind(1:mm,c(1,1:(mm-1)))]=c(cdf[1],rep(cdf[-1],each=k))
 
@@ -215,7 +220,7 @@ if(target<=0.5)
 	  omat = rbind( matrix(0, nrow = k, ncol = d), omat[2:(d+1), 2:(d+1)] )
 	  omat = cbind(matrix(0, nrow = d+k, ncol = k), omat)
 	  # Up moves
-	  omat[ cbind( 1:k, k+1 ) ] = 1 -cdf[1]
+	  omat[ cbind( 1:k, 2*k ) ] = 1 - cdf[1]
 	  # "Down" moves (really, meaningless internal-state decrements)
 	  # The first one got deleted in the expansion
 	  omat[k+1, k] = cdf[2]

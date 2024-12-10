@@ -11,29 +11,43 @@ reversmean(
   rstart = 3,
   all = TRUE,
   before = FALSE,
-  maxExclude = 1/3,
-  full = FALSE
+  conf = 0.9,
+  maxExclude = NULL,
+  full = FALSE,
+  weth66revs = TRUE,
+  evenrevs = !all,
+  ...
 )
 
-reversals(y)
+reversals(y, x = NULL, directional = TRUE, evenrevs = TRUE)
 }
 \arguments{
 \item{x}{numeric vector: sequence of administered doses, treatments, stimuli, etc.}
 
-\item{y}{numeric vector: sequence of observed responses. Must be same length as \code{x} or shorter by 1, and must be coded \code{TRUE/FALSE} or 0/1.}
+\item{y}{numeric vector: sequence of observed responses. Must be same length as \code{x} or shorter by 1, and must be coded \code{TRUE/FALSE} or 0/1. \code{dynamean()} only uses \code{y} for bootstrap confidence intervals.}
 
 \item{rstart}{the reversal point from which the averaging begins. Default 3, considered a good compromise between performance and robustness. See Details.}
 
-\item{all}{logical: from the starting point onwards, should all values of \code{x} be used (\code{TRUE}, default), or only reversal points as in the Wetherill et al. approach?}
+\item{all}{logical: from the cutoff point onwards, should all values of \code{x} be used (\code{TRUE}, default), or only reversal points as in the Wetherill et al. approach? If set to \code{FALSE}, then the \code{before} flag also defaults to \code{FALSE} regardless of user choice.}
 
-\item{before}{logical: whether to start the averaging one step earlier than the starting reversal point. Default \code{FALSE}, and ignored when \code{all=FALSE}.}
+\item{before}{logical: whether to start the averaging one observation earlier than the cutoff point. Default \code{FALSE}.}
 
-\item{maxExclude}{a fraction in \eqn{0,1} indicating the maximum initial fraction of the vector \code{x} to exclude from averaging, in case the algorithm-identified starting point occurs too late in the experiment. Default 1/3.}
+\item{conf}{the CI's confidence level, as a fraction in (0,1). To skip CI calculation set \code{conf = NULL}.}
+
+\item{maxExclude}{a fraction in \eqn{0,1} indicating the maximum initial fraction of the vector \code{x} to exclude from averaging, in case the algorithm-identified transition point occurs late in the experiment. Default 1/2.}
 
 \item{full}{logical: should more detailed information be returned, or only the estimate? (default \code{FALSE})}
+
+\item{weth66revs}{(in \code{reversmean()}) logical: identical to \code{directional}. The argument name used in \code{reversmean()} stems from the article that switched to this definition of reversals when introducing reversal-averaging.}
+
+\item{evenrevs}{logical: should only an even number of reversals be used, meaning that if the total number is odd the last one is discarded? Default \code{TRUE} per common practice. However, when setting \code{all=TRUE} it makes sense to also set \code{evenrevs=FALSE}.}
+
+\item{...}{Additional parameters, mostly ones passed on to \code{dfboot} if \code{conf} is not \code{NULL}. See that function's help for details.}
+
+\item{directional}{(in \code{reversals()}) logical: should reversals be defined as change in direction (i.e., \code{x}; \code{TRUE} which is default), or in response (\code{y})?}
 }
 \value{
-For \code{reversals()}, the indices of reversal points. For \code{reversmean()}, if \code{full=FALSE} returns the point estimate and otherwise returns a data frame with the estimate as well, as the index of the cutoff point used to start the averaging.
+For \code{reversals()}, the indices of reversal points. For \code{reversmean()}, if \code{full=FALSE} returns the point estimate and otherwise returns a data frame with the estimate, as well as the index of the cutoff point used to start the averaging.
 }
 \description{
 Dose-averaging target estimation for Up-and-Down experiments, historically the most popular approach, but not recommended as primary nowadays. Provided for completeness.
@@ -41,13 +55,13 @@ Dose-averaging target estimation for Up-and-Down experiments, historically the m
 \details{
 Up-and-Down designs (UDDs) allocate doses in a random walk centered nearly symmetrically around a balance point. Therefore, a modified average of allocated doses could be a plausible estimate of the balance point's location.
 
-During UDDs' first generation, a variety of dose-averaging estimators was developed, with the one proposed by Wetherill et al. (1966) eventually becoming the most popular. This estimator uses only doses observed at \emph{reversal} points: points with a negative response following a positive one, or vice versa. More recent research (Kershaw 1985, 1987; Oron et al. 2022, supplement) strongly indicates that in fact it is better to use all doses starting from some cut-point, rather than skip most of them and choose only reversals.
+During UDDs' first generation, a variety of dose-averaging estimators was developed, with the one proposed by Wetherill et al. (1966) eventually becoming the most popular. This estimator uses only doses observed at \emph{reversal} points: points with a negative response following a positive one, or vice versa. More recent research (Kershaw 1985, 1987; Oron et al. 2022, supplement) strongly indicates that in fact it is better to use all doses beginning from some cutoff point, rather than skip most of them and choose only reversals.
 
-The \code{reversals()} utility identifies reversal points, whereas \code{reversmean()} produces a dose-averaging estimate whose starting cut-point is determined by a reversal. User can choose whether to use all doses from that cut-point onwards, or only the reversals as in the older approaches. A few additional options make the estimate even more flexible.
+The \code{reversals()} utility identifies reversal points, whereas \code{reversmean()} produces a dose-averaging estimate whose cutoff point (which should perhaps be called the \emph{'cut-on'} point) is determined by a reversal. User can choose whether to use all doses from that cut-point onwards, or only the reversals as in the older approaches. A few additional options make the estimate even more flexible.
 
-More broadly, dose-averaging despite some advantages is not very robust, and also \strong{lacks an interval estimate with reliable coverage.} Therefore, \code{reversmean()} provides neither a confidence interval nor a standard error.
-
-For UDD target estimation we recommend using centered isotonic regression, available via \code{\link{udest}}, an up-and-down adapted wrapper to \code{cir::quickInverse()}. See Oron et al. 2022 (both article and supplement) for further information, as well as the \code{cir} package vignette.
+Starting version 0.2.0, a bootstrap confidence interval (CI) is also provided. See \code{\link{dfboot}}, \code{\link{dfsim}} for additional parameters to pass to the bootstrap routine via \code{...}, beyond the confidence level \code{conf}. For the "Classical" median-finding UDD, use \verb{design = krow, desArgs = list(k=1)}. To skip CI estimation, set \code{conf = NULL}.
+\code{reversmean()} is compatible mostly with median-targeting UDDs such as the "Classical" (traditional) design of Dixon and Mood.
+For general UDD target estimation, particularly off-median targeting designs, we recommend using centered isotonic regression, available via \code{\link{udest}}, an up-and-down adapted wrapper to \code{cir::quickInverse()}. See Oron et al. 2022 (both article and supplement) for further information, as well as the \code{cir} package vignette.
 }
 \examples{
 #'  **An up-and-down experiment that has generated some controversy**
@@ -85,10 +99,10 @@ abline(h = 21.7)
 # Our package does include the Dixon-Mood point estimate.
 #  (w/o the CIs, because we do not endorse this estimation approach)
 # Does it reproduce the article estimate?
-dixonmood(doses, responses)
+dixonmood(x = doses, y = responses)
 
 # Not at all! Let us overlay this one in red
-abline(h = dixonmood(doses, responses), col=2)
+abline(h = dixonmood(x = doses, y = responses), col=2)
 
 # We have found that many articles claiming to use Dixon-Mood (or Dixon-Massey) actually
 # Do something else. For example, in this article they report that 
@@ -106,18 +120,18 @@ abline(h = dixonmood(doses, responses), col=2)
 #    the last dose and response:
 n = length(doses)
 dosePlus1 = doses[n] + ifelse(responses[n]==0, 1, -1)
-reversmean(c(doses, dosePlus1), responses)
+reversmean(c(doses, dosePlus1), responses, conf = NULL)
 # Interestingly, in this particular case the answer is very similar to the Dixon-Mood estimate.
 
 # The `reversmean()` default averages all doses from the 3rd reversal point onwards.
 # By the way, at what point did the third reversal happen? 
 #     It'll be the 3rd number in this vector:
-reversals(responses)
+reversals(x = doses, y = responses)
 
 # Far more commonly in literature, particularly in sensory studies, 
 #   one encounters the 1960s-era approach (led by Wetherill) of taking *only doses  
 #   at reversal points, usually starting from the first one. `reversmean()` can do that too:
-wetherill = reversmean(c(doses, dosePlus1), responses, all = FALSE, rstart = 1)
+wetherill = reversmean(c(doses, dosePlus1), responses, all = FALSE, rstart = 1, conf = NULL)
 wetherill
 # This one gives an even lower result than the previous ones.
 abline(h = wetherill, col = 3)
@@ -126,10 +140,13 @@ abline(h = wetherill, col = 3)
 # It does not require the y values at all. The underlying assumption is that the dose 
 #   sequence has done enough meandering around the true balance point, to provide information
 #   about where (approximately) the starting-dose effect is neutralized.
-adaptmean(c(doses, dosePlus1))
+# This function now also provides bootstrap CIs, so we need to give it the y values. 
+# The default forces the final 2/3 of observations to be included; here in view of the long run-in
+#     we are relaxing this
+dynamean(c(doses, dosePlus1), responses, maxExclude = 0.5, conf = NULL)
 # Again a bit curiously, this relatively recent approach gives a result similar to what
 #   the authors reported (but not similar to the original Dixon-Mood).
-# This is not too surprising, since here `adaptmean()` excludes the first one-third of doses,
+# This is not too surprising, since here `dynamean()` excludes the first one-third of doses,
 #   which is approximately what happened if indeed the authors excluded all those long dose-increase
 #   sequences at the start.
 
@@ -138,7 +155,22 @@ adaptmean(c(doses, dosePlus1))
 #    choice of starting point (which in many studies, due to safety concerns cannot be evaded)
 #    there is really no good option of which observations to exclude.
 
-# This is one reason why we strongly recommend using Centered Isotonic Regression as default:
+# This is one reason why we strongly recommend using Centered Isotonic Regression as default. 
+# Figure soon to follow.
+# But first, have you noted how we keep specifying "conf = NULL"? 
+# This is because now at default, these averages calculate
+# A bootstrap confidence-interval. 
+# These intervals are generally deficient but are the best anyone can do at present.
+
+# If you want to use a confidence interval, you must provide the experiment's target, 
+#    or more precisely its balance point, as well as the parameters to use in 
+# the bootstrap simulation (which should be the ones generating the original experiment).
+
+# Like this (not run, to avoid violating CRAN's very narrow limits on example runtime):
+# dynamean(c(doses, dosePlus1), responses, maxExclude = 0.5, target = 0.5, 
+#                  design = krow, desArgs = list(k=1) )
+
+
 defest = udest(doses, responses, target = 0.5)
 abline(h = defest$point, col = 'purple')
 # For this dataset, it is the highest of all the estimates.
@@ -146,6 +178,7 @@ abline(h = defest$point, col = 'purple')
 legend('bottomright', col = c(1:3, 'purple'), 
        legend = c("Article's estimate", 'Dixon-Mood', 'Reversals (Wetherill)', 'Standard (CIR)'), 
        lty = 1, bty='n', cex = 0.8)
+
 
 par(op) # Back to business as usual ;)
 }
@@ -159,7 +192,7 @@ par(op) # Back to business as usual ;)
 \seealso{
 \itemize{
 \item \code{\link{udest}}, the recommended estimation method for up-and-down targets.
-\item \code{\link{adaptmean}}, an unpublished but arguably better approach to dose-averaging (this is \emph{not} the recommended method though; that would be \code{\link{udest}} referenced above).
+\item \code{\link{dynamean}}, an unpublished but arguably better approach to dose-averaging (this is \emph{not} the recommended method though; that would be \code{\link{udest}} referenced above).
 }
 }
 \author{

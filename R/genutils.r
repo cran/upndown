@@ -242,9 +242,11 @@ After positive response, 'toss a COIN':
 #' @param k (`checkNatural()` only) input number to check whether it's a natural number 
 #' @param toolarge (`checkNatural()` only) what number would be considered too large to be realistic?
 #' @param x (`checkDose()` only) input object to be verified as valid dose values
-#' @param maxfrac (`checkDose()` only) maximum number of unique values (as fraction of sample size) considered realistic for up-and-down data. Default one-half.
+#' @param maxfrac (`checkDose()` only) maximum number of unique values (as fraction of sample size) considered realistic for up-and-down data. Default $0.9n.$ Function also gives a warning if number exceeds $n/2$, since typically this suggests the effective sample size around target is too small.
 #' @param y (`checkResponse()` only) input object to be verified as valid response values (`TRUE/FALSE or 0/1)
-
+#' @param flatOK logical (`checkCDF()` only) if the CDF is completely flat, should function issue a warning (`TRUE`, default) - or stop with an error (`FALSE`)?
+#' 
+#' 
 #' @return If a validation issue is found, these functions stop with a relevant error message. If no issue is found, they run through without returning a value.
 
 #' @export
@@ -258,13 +260,19 @@ validUDinput<-function(cdf, target)
 #' @rdname validUDinput
 #' @export
 checkTarget <- function(target, tname = 'Target')
-  if(target<=0 || target>=1) stop(paste(tname, "has to be in (0,1).\n"))
+  if( any(target<=0 | target>=1) ) stop(paste(tname, "has to be in (0,1).\n"))
 
 #' @rdname validUDinput
 #' @import stats
 #' @export
-checkCDF <- function(cdf)
-  if(min(cdf)<0 || max(cdf)>1 || any(diff(cdf) < 0) || var(cdf)==0) stop("cdf should be a CDF.\n")
+checkCDF <- function(cdf, flatOK = TRUE)
+{
+  if(length(cdf) < 1 || min(cdf)<0 || max(cdf)>1 || any(diff(cdf) < 0)) stop("cdf should be a CDF.\n")
+  if(var(cdf)==0) {
+    if(!flatOK) stop("cdf is compeletely flat.\n")
+    warning("cdf is compeletely flat.\n")
+  }
+}
 
 ## Natural number verification
 
@@ -278,11 +286,13 @@ if (any(k != round(k) | k < 1 | k >= toolarge))
 
 #' @rdname validUDinput
 #' @export
-checkDose <- function(x, maxfrac = 0.5)
+checkDose <- function(x, maxfrac = 0.9)
 {
   if(length(dim(x))>1 || any(dim(x))>1) stop("Dose must be a vector or equivalent.\n")
   if( length(unique(x)) > maxfrac * length(x))
     stop("Too many unique dose values. Experiment not U&D, or was too short, or data-quality error.\n")
+  if( length(unique(x)) > length(x)/2)
+    warning("Number of unique dose values exceeds n/2.\n The experiment might be too short, or started too far from apparent target.\n Otherwise, there might be a data-quality error.\n")
 }
 
 #' @rdname validUDinput

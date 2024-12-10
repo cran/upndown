@@ -4,7 +4,16 @@
 \alias{udest}
 \title{Centered-Isotonic-Regression (CIR) Estimate for the Up-and-Down Target Dose}
 \usage{
-udest(x, y, target, balancePt = target, conf = 0.9, ...)
+udest(
+  x,
+  y,
+  target,
+  balancePt = target,
+  conf = 0.9,
+  allow1extra = FALSE,
+  curvedCI = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{numeric vector: sequence of administered doses, treatments, stimuli, etc.}
@@ -15,12 +24,18 @@ udest(x, y, target, balancePt = target, conf = 0.9, ...)
 
 \item{balancePt}{In case the design's inherent balance point differs somewhat from \code{target}, specify it here to improve estimation accuracy. See Details for further explanation. Otherwise, this argument defaults to be equal to \code{target}.}
 
-\item{conf}{The desired confidence level for the confidence interval. Default \eqn{90\%.} We do not recommend increasing to \eqn{95\%} unless you have \eqn{\sim 100} or more observations.}
+\item{conf}{The desired confidence level for the confidence interval. Default \eqn{90\%.} We do not recommend increasing to \eqn{95\%} unless you have \eqn{\sim 100} or more observations. Setting to \code{NULL} triggers special behavior; see under "Value".}
+
+\item{allow1extra}{logical: allow \code{length(x)} to be either equal or 1 greater than \code{length(y)}? (default \code{FALSE}) The \emph{"n+1"} dose-allocation, determined from the last allocations and responses, might be tagged onto \code{x}. If this point is provided and \code{allow1extra=TRUE}, \code{udplot()} will show it as a grey diamond; the other functions will ignore it.}
+
+\item{curvedCI}{logical: should confidence-interval boundaries rely upon an outwardly-curving interpolation (\code{TRUE}) or linear? If \code{NULL} (default), it will be \code{TRUE} for targets outside the 40th-60th percentile range.}
 
 \item{...}{Pass-through argument added for flexible calling context.}
 }
 \value{
-A one-row data frame with 4 variables: \code{target}, \code{point} (the point estimate), \verb{lowerXYconf, upperXYconf} (the confidence bounds, with \code{XY} standing for the percents, default \code{90}).
+Geneally, a one-row data frame with 4 variables: \code{target}, \code{point} (the point estimate), \verb{lowerXYconf, upperXYconf} (the confidence bounds, with \code{XY} standing for the percents, default \code{90}).
+
+However, if \code{conf = NULL} only the point estimate will be returned. This is for compatibility with bootstrap confidence intervals (which is not implemented as default for CIR), and with UD ensemble simulation in general.
 }
 \description{
 Centered Isotonic Regression (CIR) is an extension of isotonic regression (IR), substantially improving upon IR's estimation performance in the dose-response and dose-finding contexts (Oron and Flournoy 2017, Flournoy and Oron 2020). CIR is the recommended method for estimating up-and-down targets.
@@ -95,7 +110,7 @@ par(op) # Back to business as usual ;)
 }
 \references{
 \itemize{
-\item Oron AP, Flournoy N.  Centered Isotonic Regression: Point and Interval Estimation for Dose-Response Studies. \emph{Statistics in Biopharmaceutical Research} 2017; 9, 258-267. \href{https://arxiv.org/pdf/1701.05964.pdf}{Author's public version available on arxiv.org.}
+\item Oron AP, Flournoy N.  Centered Isotonic Regression: Point and Interval Estimation for Dose-Response Studies. \emph{Statistics in Biopharmaceutical Research} 2017; 9, 258-267. \href{https://arxiv.org/pdf/1701.05964}{Author's public version available on arxiv.org.}
 \item Flournoy N, Oron AP. Bias Induced by Adaptive Dose-Finding Designs. \emph{Journal of Applied Statistics} 2020; 47, 2431-2442.
 \item Oron AP, Souter MJ, Flournoy N. Understanding Research Methods: Up-and-down Designs for Dose-finding. \emph{Anesthesiology} 2022; 137:137–50. \href{https://cdn-links.lww.com/permalink/aln/c/aln_2022_05_25_oron_aln-d-21-01101_sdc1.pdf}{See in particular the open-access Supplement.}
 }

@@ -13,11 +13,11 @@ validUDinput(cdf, target)
 
 checkTarget(target, tname = "Target")
 
-checkCDF(cdf)
+checkCDF(cdf, flatOK = TRUE)
 
 checkNatural(k, parname, toolarge = 1000)
 
-checkDose(x, maxfrac = 0.5)
+checkDose(x, maxfrac = 0.9)
 
 checkResponse(y)
 }
@@ -25,6 +25,8 @@ checkResponse(y)
 \item{cdf}{vector of values, should be nondecreasing between 0 and 1 (inclusive)}
 
 \item{target}{numeric value(s), should be between 0 and 1 (exclusive)}
+
+\item{flatOK}{logical (\code{checkCDF()} only) if the CDF is completely flat, should function issue a warning (\code{TRUE}, default) - or stop with an error (\code{FALSE})?}
 
 \item{k}{(\code{checkNatural()} only) input number to check whether it's a natural number}
 
@@ -34,7 +36,7 @@ checkResponse(y)
 
 \item{x}{(\code{checkDose()} only) input object to be verified as valid dose values}
 
-\item{maxfrac}{(\code{checkDose()} only) maximum number of unique values (as fraction of sample size) considered realistic for up-and-down data. Default one-half.}
+\item{maxfrac}{(\code{checkDose()} only) maximum number of unique values (as fraction of sample size) considered realistic for up-and-down data. Default $0.9n.$ Function also gives a warning if number exceeds $n/2$, since typically this suggests the effective sample size around target is too small.}
 
 \item{y}{(\code{checkResponse()} only) input object to be verified as valid response values (`TRUE/FALSE or 0/1)}
 }

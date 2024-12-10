@@ -12,6 +12,7 @@ udplot(
   connect = TRUE,
   symbcol = 1,
   doselabels = NULL,
+  allow1extra = FALSE,
   xtitle = "Observation Order",
   ytitle = "Dose / Stimulus",
   ...
@@ -31,6 +32,8 @@ udplot(
 \item{symbcol}{The color of the main plotting symbols and connecting lines. Default 1 (the current palette's first color). Note: if you change the color and inadvertently use \code{col} instead, there might be an error message.}
 
 \item{doselabels}{(\code{DRtrace} only) Dose values to be plotted along the y-axis. If \code{NULL} (default), those will be the doses in the dataset (i.e., \code{sort(unique(x))}).}
+
+\item{allow1extra}{logical: allow \code{length(x)} to be either equal or 1 greater than \code{length(y)}? (default \code{FALSE}) The \emph{"n+1"} dose-allocation, determined from the last allocations and responses, might be tagged onto \code{x}. If this point is provided and \code{allow1extra=TRUE}, \code{udplot()} will show it as a grey diamond; the other functions will ignore it.}
 
 \item{xtitle, ytitle}{x-axis and y-axis titles. Some reasonable defaults are provided, to avoid an annoying error message.}
 
@@ -115,17 +118,17 @@ udplot(x=x, y=y, cohort=gsize, connect=FALSE, shape='triangle')
 
 par(op) # Back to business as usual ;)
 }
+\references{
+\itemize{
+\item Dixon WJ, Mood AM. A method for obtaining and analyzing sensitivity data. \emph{J Am Stat Assoc.} 1948;43:109-126.
+\item Oron AP, Souter MJ, Flournoy N. Understanding Research Methods: Up-and-down Designs for Dose-finding. \emph{Anesthesiology} 2022; 137:137–50.
+}
+}
 \seealso{
 \itemize{
 \item \code{\link[cir]{plot.DRtrace}}, \code{cir} package.
 \item \code{\link{drplot}} for the up-and-down dose-response and estimate plotting.
 \item \code{cir} package vignette.
-}
-
-#' @references
-\itemize{
-\item Dixon WJ, Mood AM. A method for obtaining and analyzing sensitivity data. \emph{J Am Stat Assoc.} 1948;43:109-126.
-\item Oron AP, Souter MJ, Flournoy N. Understanding Research Methods: Up-and-down Designs for Dose-finding. \emph{Anesthesiology} 2022; 137:137–50.
 }
 }
 \author{
