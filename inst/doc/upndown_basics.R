@@ -1,9 +1,7 @@
 ## ----setup, include = FALSE---------------------------------------------------
 #### Note to self: Use this before committing to GitHub, after a stable version
 # tools::buildVignettes(dir = '.',  tangle=TRUE)
-# Then either manually copy the files into inst/doc, or use the below
-# dir.create("inst/doc")
-# file.copy(dir("vignettes", full.names=TRUE), "inst/doc", overwrite=TRUE)
+# Then, not sure whether it's necessary to move/copy the files into inst/doc 
 # (from https://community.rstudio.com/t/browsevignettes-mypackage-saying-no-vignettes-found/68656/6)
 
 knitr::opts_chunk$set(
