@@ -1,10 +1,10 @@
 #' Centered-Isotonic-Regression (CIR) Estimate for the Up-and-Down Target Dose
 #' 
-#' Centered Isotonic Regression (CIR) is an extension of isotonic regression (IR), substantially improving upon IR's estimation performance in the dose-response and dose-finding contexts (Oron and Flournoy 2017, Flournoy and Oron 2020). CIR is the recommended method for estimating up-and-down targets. 
+#' Centered Isotonic Regression (CIR) is an extension of isotonic regression (IR), substantially improving upon IR's estimation performance in the dose-response and dose-finding contexts (Oron and Flournoy 2017, Flournoy and Oron 2019). CIR is the recommended method for estimating up-and-down targets. 
 #' 
 #'  CIR and related methods are available in the `cir` package. The `udest()` function in the present package provides a convenient wrapper for `cir::quickInverse()`, with arguments already set to the appropriate values for estimating the target dose after an up-and-down experiment. The function also returns a confidence interval as default.
 #' 
-#' **WARNING!** You should not estimate target doses too far removed from the design's actual balance point (definitely no further than 0.1, e.g., estimating the 33rd percentile for a design whose balance point is the median). As Flournoy and Oron (2020) explain, observed response rates are biased away from the balance point. Even though `udest()` performs the rudimentary bias correction described in that article, practically speaking this correction's role is mostly to expand the confidence intervals in response to the bias. It cannot guarantee to provide reliable off-balance-point estimates.
+#' **WARNING!** You should not estimate target doses too far removed from the design's actual balance point (definitely no further than 0.1, e.g., estimating the 33rd percentile for a design whose balance point is the median). As Flournoy and Oron (2019) explain, observed response rates are biased away from the balance point. Even though `udest()` performs the rudimentary bias correction described in that article, practically speaking this correction's role is mostly to expand the confidence intervals in response to the bias. It cannot guarantee to provide reliable off-balance-point estimates.
 #'
 #' @author Assaf P. Oron \code{<assaf.oron.at.gmail.com>}	 
 #' 
@@ -28,9 +28,8 @@
 #' 
 #' @references 
 #'  - Oron AP, Flournoy N.  Centered Isotonic Regression: Point and Interval Estimation for Dose-Response Studies. *Statistics in Biopharmaceutical Research* 2017; 9, 258-267. [Author's public version available on arxiv.org.](https://arxiv.org/pdf/1701.05964)
-#'  - Flournoy N, Oron AP. Bias Induced by Adaptive Dose-Finding Designs. *Journal of Applied Statistics* 2020; 47, 2431-2442.  
+#'  - Flournoy N, Oron AP. Bias Induced by Adaptive Dose-Finding Designs. *Journal of Applied Statistics* 2019; 47, 2431-2442.  
 #'  - Oron AP, Souter MJ, Flournoy N. Understanding Research Methods: Up-and-down Designs for Dose-finding. *Anesthesiology* 2022; 137:137–50. [See in particular the open-access Supplement.](https://cdn-links.lww.com/permalink/aln/c/aln_2022_05_25_oron_aln-d-21-01101_sdc1.pdf)
-#'  - Oron AP, Souter MJ, Flournoy N. [Understanding Research Methods: Up-and-down Designs for Dose-finding.](https://journals.lww.com/anesthesiology/fulltext/2022/08000/understanding_research_methods__up_and_down.9.aspx) *Anesthesiology* 2022; 137:137–50. 
 
 #'  
 #' @seealso 
@@ -83,9 +82,10 @@ tmp
 #' 
 #' Plotting function for the "trace" (time series) of an up-and-down experiment, showing the observation order on the x-axis, and the dose *(treatment, stimulus, etc.)* strength on the y-axis. Uses utilities from the `cir` package.
 #' 
-#' This simple and handy visualization approach was presented already by Dixon and Mood (1948). 
+#' This simple and handy visualization approach was presented already in up-and-down's founding document, a lesser-known 1944 report by the world-famous wartime Statistical Research Group - Princeton (SRG-P). 
+#' 
 #'  - It conveys directly the meaning of *"up-and-down"*, because the administered dose/stimulus strength is on the y-axis, whereas observation order is on the x-axis. 
-#'  - Filled symbols stand for positive responses and open symbols for negative.   
+#'  - Filled symbols (x's in the original) stand for positive responses, and open symbols for negative.   
 #'  - The design's transition rules can be usually inferred directly from the plot.
 #'  
 #'  `udplot()` is a convenience wrapper to `cir::plot.DRtrace`. This is a base-R plot, so you can use additional options, including preceding the plot command with \code{\link[graphics]{par}} statements, or following up with \code{\link[graphics]{legend}}. When wishing to save to a file, I recommend utilities such as `png()` or `pdf()`.
@@ -105,7 +105,7 @@ tmp
 #'  - `cir` package vignette.
 #'  
 #' @references 
-#'  - Dixon WJ, Mood AM. A method for obtaining and analyzing sensitivity data. *J Am Stat Assoc.* 1948;43:109-126.
+#'  - Statistical Research Group, Princeton University (SRG-P). *Statistical analysis for a new procedure in sensitivity experiments.* Applied Mathematics Panel, National Defense Research Committee Report No. 101.1R, OSRD No. 4040, 1944. https://digitalcollections.crl.edu/record/2518.
 #'  - Oron AP, Souter MJ, Flournoy N. Understanding Research Methods: Up-and-down Designs for Dose-finding. *Anesthesiology* 2022; 137:137–50. 
 
 
@@ -113,15 +113,19 @@ tmp
 #' @inheritParams udest
 
 #' @param cohort for a group/cohort UD design, the cohort/group size (a single number). In case of variable cohort size, this can be a vector the same length as `x, y`, with each observation's cohort assignment.
-#' @param shape the plotting shape (DRtrace only): `'circle'` (default), `'square'`, or `'triangle'`.
+#' @param shape the plotting shape. For `udplot` there are 3 options: `'circle'` (default), `'square'`, or `'triangle'`. For `drplot` this argument is equivalent to base-R's `pch`, with `X` as default.
 #' @param connect logical: whether to connect the symbols (generic plotting type `'b'`). Default \code{TRUE} for `udplot()` and \code{FALSE} for `drplot()`.
-#' @param symbcol The color of the main plotting symbols and connecting lines. Default 1 (the current palette's first color). Note: if you change the color and inadvertently use \code{col} instead, there might be an error message.
+#' @param symbsize The size of the main plotting symbols. Default 1.5. Notes: 1) With `shape = 'circle'`, going below ~1.1 might generate odd-looking open symbols. 2) if you inadvertently use `cex` instead of `symbsize`, there might be an error message.
+#' @param symbcol The color of the main plotting symbols (`udplot` only). Default 1 (the current palette's first color). Note: if you inadvertently use \code{col} instead, there might be an error message.
+#' @param linecol The color of connecting lines (if `connect = TRUE`). Default is to be the same as `symbcol`.
 #' @param xtitle,ytitle	x-axis and y-axis titles. Some reasonable defaults are provided, to avoid an annoying error message.
-#' @param doselabels (\code{DRtrace} only) Dose values to be plotted along the y-axis. If \code{NULL} (default), those will be the doses in the dataset (i.e., `sort(unique(x))`).
+#' @param obslabels Observation indices to be plotted along the x-axis (`udplot()` only). Allows user to choose, e.g., every 5th observation to be labeled, rather than whatever the R graphics environment decides (which is what happens if you leave the \code{NULL} default unchanged).
+#' @param doselabels Dose values to be plotted along the y-axis (`udplot()`) or x-axis (`drplot()`). Must be on same scale as `x`. If \code{NULL} (default), those will be the doses in the dataset (i.e., `sort(unique(x))`).
 #' @param ...	Other arguments passed on to \code{\link[graphics]{plot}} (e.g., `main` for the main title). 
 
 
-udplot <- function(x, y, cohort=NULL, shape='circle', connect=TRUE, symbcol=1, doselabels=NULL, allow1extra = FALSE, 
+udplot <- function(x, y, cohort=NULL, shape='circle', connect=TRUE, symbcol = 1, linecol = symbcol, 
+                   symbsize = 1.5, obslabels = NULL, doselabels=NULL, allow1extra = FALSE, 
                    xtitle = "Observation Order", ytitle = "Dose / Stimulus",...)
 {
 
@@ -136,8 +140,14 @@ if(length(x) != n)
 }
 
 if(!is.null(cohort)) checkNatural(cohort, parname = 'cohort')
-xbounds = c(1, ifelse(allow1extra, length(x), n) )
-plot(cir::DRtrace(x=x[1:n], y=y, cohort=cohort), shape=shape, connect=connect, mcol=symbcol, dosevals=doselabels,
+
+dout = cir::DRtrace(x=x[1:n], y=y, cohort=cohort)
+# Special case of cohorts:
+if(is.null(obslabels) & !is.null(cohort)) obslabels = sort(unique(dout$cohort))
+xbounds = c(1, ifelse(allow1extra, length(x), max(dout$cohort)) )
+
+plot(dout, shape=shape, connect=connect, scol=symbcol, lcol = linecol, 
+     size = symbsize, dosevals=doselabels, obsvals=obslabels,
              xlab=xtitle, ylab=ytitle, xlim = xbounds, ...)
 if(length(x)==n+1) points(n+1, x[n+1], pch = 23, bg = 'grey', col = 'grey')
   
@@ -180,13 +190,16 @@ if(length(x)==n+1) points(n+1, x[n+1], pch = 23, bg = 'grey', col = 'grey')
 #' 
 #' @param addest logical: should we add the CIR target-dose estimate and its confidence interval? If `FALSE` (default), then arguments `addcurve, target, balancePt, conf, estcol, estsize, estsymb, esthick, curvecol` - are all ignored.
 #' @param addcurve logical: should we add the complete estimated CIR dose-response curve? Default `FALSE`, and only relevant when `addest = TRUE`.
-#' @param estcol,estsize,estsymb,esthick,curvecol graphical parameters controlling the colors, symbol choice, size, thickness, of the target-dose and CIR-curve visuals.
+#' @param estcol,estsize,estsymb,esthick,curvethick,curvetype,curvecol graphical parameters controlling the colors, symbol choice, size, thickness, and style, of the target-dose and CIR-curve visuals.
 #' @param percents logical, whether to represent the y-axis as percents rather than a fraction.
-
-drplot <- function(x, y, shape='X', connect=FALSE, symbcol=1, percents = FALSE,
+#' @param symbsize A scaling factor for the observation symbol sizes. By default symbol size will vary with observation count; to change that you will need to send some arguments to `cir::plot.doseResponse()`. 
+#' 
+drplot <- function(x, y, shape='X', connect=FALSE, symbcol=1, percents = FALSE, 
+                   doselabels=NULL, symbsize = NULL,
                    addest=FALSE, addcurve=FALSE, target=NULL, balancePt=target, conf=0.9,
-                   estcol = 'purple', estsize=2, estsymb=19, esthick=2, curvecol = 'blue', allow1extra = FALSE,
-                   ytitle = "Frequency of Positive Response", xtitle = "Dose / Stimulus",...)
+                   estcol = 'purple', estsize=2.5, estsymb=19, esthick=2.5, 
+                   curvethick=1.5, curvetype=1, curvecol = 'blue', allow1extra = FALSE,
+                   ytitle = "Positive Response Rate", xtitle = "Dose / Stimulus",...)
 {
 requireNamespace('cir')
   
@@ -202,35 +215,34 @@ requireNamespace('cir')
   }
   checkDose(x)
   checkResponse(y)
-  if(balancePt[1]!=target)
-  {
-    if(length(balancePt) > 1) stop("Experiment can only have a single balance point.\n")
-    checkTarget(balancePt, tname='balancePt')
-    if(abs(balancePt - target) > 0.1) warning("We strongly advise against estimating targets this far from the design's balance point.\n")
-  }
   
 tmp = cir::doseResponse(x=x, y=y)
 if(percents) tmp$y = 100 * tmp$y
   
-plot(tmp, pch=shape, connect=connect, mcol=symbcol, 
-       xlab=xtitle, ylab=ytitle, ...)
+plot(tmp, pch=shape, connect=connect, scol = symbcol, refsize = symbsize,
+       xlab=xtitle, ylab=ytitle, dosevals = doselabels, ...)
+
+if(addcurve)
+{
+  if(!addest) 
+    stop("To plot a curve you must estimate it first, by setting addest = TRUE \n 
+           and providing additional parameters. See function help.\n")
+  fest = cir::cirPAVA(x=x, y=y, target=balancePt, adaptiveShrink=TRUE, full=TRUE)
+  if(percents) fest$shrinkage$y = 100 * fest$shrinkage$y
+  lines(y ~ x, data = fest$shrinkage, col=curvecol, lwd = curvethick, lty = curvetype)
+  
+}
 
 if(addest)
 {
-  if(is.null(target)) stop("To plot an estimate, please specify the target response rate.\n")
+  if(is.null(target)) stop("To plot an estimate, please specify the target response rate,\n
+                           and the balance point (if different).\n")
   checkTarget(target)
   est = udest(x=x, y=y, target=target, balancePt=balancePt, conf=conf, ...)
   if(percents) est$target = 100 * est$target
   points(target ~ point, data=est, pch=estsymb, col=estcol, cex=estsize)
   lines(x = c(est[1,3], est[1,4]), y = rep(est$target, 2), col=estcol, lwd = esthick)
   
-  if(addcurve)
-  {
-    fest = cir::cirPAVA(x=x, y=y, target=balancePt, adaptiveShrink=TRUE, full=TRUE)
-    if(percents) fest$shrinkage$y = 100 * fest$shrinkage$y
-    lines(y ~ x, data = fest$shrinkage, col=curvecol, lwd = esthick)
-    
-  }
  
 }
   

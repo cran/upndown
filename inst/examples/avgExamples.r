@@ -1,3 +1,4 @@
+
 #'  **An up-and-down experiment that has generated some controversy**
 #'  
 #' Van Elstraete, AC et al. The Median Effective Dose of Preemptive Gabapentin 
@@ -18,13 +19,16 @@ responses = c( (1 - sign(diff(doses)))/2, 0 )
 # Saving current settings as now required by the CRAN powers-that-be :0
 op <- par(no.readonly = TRUE)
 
-par(mar=c(4,4,4,1), mgp=c(2.5,0.8,0), cex.axis = 0.7, las = 1)
+layout(1)
+par(mar=c(4,4,4,1), mgp=c(2.5,0.8,0), cex.axis = 1, las = 1)
+lwid = 2
+
 udplot(doses, responses, main='Van Elstraete et al. 2008 Study', 
        xtitle = "Patient Number", ytitle = 'Gabapentin (mg/kg)') 
 
 
 #' Overlay the ED50 reported in the article (21.7 mg/kg):
-abline(h = 21.7)
+abline(h = 21.7, lwd = lwid)
 
 #' The authors cite a little-known 1991 article by Dixon as the method source.
 #' However, in their author rejoinder they claim to have used the Dixon-Mood (1948) estimate.
@@ -36,7 +40,7 @@ abline(h = 21.7)
 dixonmood(x = doses, y = responses)
 
 # Not at all! Let us overlay this one in red
-abline(h = dixonmood(x = doses, y = responses), col=2)
+abline(h = dixonmood(x = doses, y = responses), col=2, lwd = lwid)
 
 # We have found that many articles claiming to use Dixon-Mood (or Dixon-Massey) actually
 # Do something else. For example, in this article they report that 
@@ -68,16 +72,20 @@ reversals(x = doses, y = responses)
 wetherill = reversmean(c(doses, dosePlus1), responses, all = FALSE, rstart = 1, conf = NULL)
 wetherill
 # This one gives an even lower result than the previous ones.
-abline(h = wetherill, col = 3)
+abline(h = wetherill, col = 3, lwd = lwid)
 
 # There's another approach to dose-averaging, although it is not in use anywhere that we know of.
 # It does not require the y values at all. The underlying assumption is that the dose 
 #   sequence has done enough meandering around the true balance point, to provide information
 #   about where (approximately) the starting-dose effect is neutralized.
 # This function now also provides bootstrap CIs, so we need to give it the y values. 
-# The default forces the final 2/3 of observations to be included; here in view of the long run-in
-#     we are relaxing this
-dynamean(c(doses, dosePlus1), responses, maxExclude = 0.5, conf = NULL)
+# Its default forces the final 1/2 of observations to be included, 
+#                      regardless of how far the starting point.
+# If you do want to use dose-averaging, this is the estimator we recommend:
+
+dynamic = dynamean(c(doses, dosePlus1), responses, conf = NULL)
+abline(h = dynamic, col = 'cyan', lwd = lwid)
+
 # Again a bit curiously, this relatively recent approach gives a result similar to what
 #   the authors reported (but not similar to the original Dixon-Mood).
 # This is not too surprising, since here `dynamean()` excludes the first one-third of doses,
@@ -105,13 +113,15 @@ dynamean(c(doses, dosePlus1), responses, maxExclude = 0.5, conf = NULL)
 #                  design = krow, desArgs = list(k=1) )
 
 
+### Lastly, our recommended standard up-and-down estimator. It is *not* a dose average:
 defest = udest(doses, responses, target = 0.5)
-abline(h = defest$point, col = 'purple')
+abline(h = defest$point, col = 'purple', lwd = lwid)
 # For this dataset, it is the highest of all the estimates.
 
-legend('bottomright', col = c(1:3, 'purple'), 
-       legend = c("Article's estimate", 'Dixon-Mood', 'Reversals (Wetherill)', 'Standard (CIR)'), 
-       lty = 1, bty='n', cex = 0.8)
+legend('bottomright', col = c(1:3, 'purple', 'cyan'), 
+       legend = c("Article's estimate", 'SRG-P / Dixon-Mood', 'Reversals (Wetherill)', 
+                  'New Standard (CIR)', 'Dynamic Average'), 
+       lty = 1, bty='n', cex = 1.2, lwd = lwid)
 
 
 par(op) # Back to business as usual ;)

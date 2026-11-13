@@ -11,18 +11,22 @@ drplot(
   connect = FALSE,
   symbcol = 1,
   percents = FALSE,
+  doselabels = NULL,
+  symbsize = NULL,
   addest = FALSE,
   addcurve = FALSE,
   target = NULL,
   balancePt = target,
   conf = 0.9,
   estcol = "purple",
-  estsize = 2,
+  estsize = 2.5,
   estsymb = 19,
-  esthick = 2,
+  esthick = 2.5,
+  curvethick = 1.5,
+  curvetype = 1,
   curvecol = "blue",
   allow1extra = FALSE,
-  ytitle = "Frequency of Positive Response",
+  ytitle = "Positive Response Rate",
   xtitle = "Dose / Stimulus",
   ...
 )
@@ -32,13 +36,17 @@ drplot(
 
 \item{y}{numeric vector: sequence of observed responses. Must be same length as \code{x}, and must be coded \code{TRUE/FALSE} or 0/1.}
 
-\item{shape}{the plotting shape (DRtrace only): \code{'circle'} (default), \code{'square'}, or \code{'triangle'}.}
+\item{shape}{the plotting shape. For \code{udplot} there are 3 options: \code{'circle'} (default), \code{'square'}, or \code{'triangle'}. For \code{drplot} this argument is equivalent to base-R's \code{pch}, with \code{X} as default.}
 
 \item{connect}{logical: whether to connect the symbols (generic plotting type \code{'b'}). Default \code{TRUE} for \code{udplot()} and \code{FALSE} for \code{drplot()}.}
 
-\item{symbcol}{The color of the main plotting symbols and connecting lines. Default 1 (the current palette's first color). Note: if you change the color and inadvertently use \code{col} instead, there might be an error message.}
+\item{symbcol}{The color of the main plotting symbols (\code{udplot} only). Default 1 (the current palette's first color). Note: if you inadvertently use \code{col} instead, there might be an error message.}
 
 \item{percents}{logical, whether to represent the y-axis as percents rather than a fraction.}
+
+\item{doselabels}{Dose values to be plotted along the y-axis (\code{udplot()}) or x-axis (\code{drplot()}). Must be on same scale as \code{x}. If \code{NULL} (default), those will be the doses in the dataset (i.e., \code{sort(unique(x))}).}
+
+\item{symbsize}{A scaling factor for the observation symbol sizes. By default symbol size will vary with observation count; to change that you will need to send some arguments to \code{cir::plot.doseResponse()}.}
 
 \item{addest}{logical: should we add the CIR target-dose estimate and its confidence interval? If \code{FALSE} (default), then arguments \verb{addcurve, target, balancePt, conf, estcol, estsize, estsymb, esthick, curvecol} - are all ignored.}
 
@@ -50,7 +58,7 @@ drplot(
 
 \item{conf}{The desired confidence level for the confidence interval (CI). Default \eqn{90\%.} We do not recommend increasing to \eqn{95\%} unless you have \eqn{\sim 100} or more observations. Setting to \code{NULL} if you don't want a CI. See more under "Value".}
 
-\item{estcol, estsize, estsymb, esthick, curvecol}{graphical parameters controlling the colors, symbol choice, size, thickness, of the target-dose and CIR-curve visuals.}
+\item{estcol, estsize, estsymb, esthick, curvethick, curvetype, curvecol}{graphical parameters controlling the colors, symbol choice, size, thickness, and style, of the target-dose and CIR-curve visuals.}
 
 \item{allow1extra}{logical: allow \code{length(x)} to be either equal or 1 greater than \code{length(y)}? (default \code{FALSE}) The \emph{"n+1"} dose-allocation, determined from the last allocations and responses, might be tagged onto \code{x}. If this point is provided and \code{allow1extra=TRUE}, \code{udplot()} will show it as a grey diamond; the other functions will ignore it.}
 

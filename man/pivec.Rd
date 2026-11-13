@@ -119,7 +119,7 @@ round(cumulvec(cdf = equivF, matfun = classicmat, startdose = 6, n = 30, exclude
 \itemize{
 \item Diaconis P, Stroock D. Geometric Bounds for Eigenvalues of Markov Chains. \emph{Ann. Appl. Probab.} 1991;1(1):36-61.
 \item Hughes BD. \emph{Random Walks and Random Environments, Vol. 1.} Oxford University Press, 1995.
-\item Oron AP, Flournoy N. \href{https://nejsds.nestat.org/journal/NEJSDS/article/86/text}{Up-and-Down: The Most Popular, Most Reliable, and Most Overlooked Dose-Finding Design.} \emph{New Eng J Stat Data Science} 2024; 1-12.
+\item Oron AP, Flournoy N. \href{https://nejsds.nestat.org/journal/NEJSDS/article/86/text}{Up-and-Down: The Most Popular, Most Reliable, and Most Overlooked Dose-Finding Design.} \emph{New Eng J Stat Data Science} 2025; 3:222–233.
 \item Oron AP, Hoff PD. The k-in-a-row up-and-down design, revisited. \emph{Stat Med.} 2009;28:1805-1820.
 \item Oron AP, Souter MJ, Flournoy N. \href{https://journals.lww.com/anesthesiology/fulltext/2022/08000/understanding_research_methods__up_and_down.9.aspx}{Understanding Research Methods: Up-and-down Designs for Dose-finding.} \emph{Anesthesiology} 2022; 137:137–50.
 }

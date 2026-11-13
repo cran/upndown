@@ -47,7 +47,7 @@
 #' @references 
 #'  - Diaconis P, Stroock D. Geometric Bounds for Eigenvalues of Markov Chains. *Ann. Appl. Probab.* 1991;1(1):36-61. 
 #'  - Hughes BD. *Random Walks and Random Environments, Vol. 1.* Oxford University Press, 1995.
-#'  - Oron AP, Flournoy N. [Up-and-Down: The Most Popular, Most Reliable, and Most Overlooked Dose-Finding Design.](https://nejsds.nestat.org/journal/NEJSDS/article/86/text) *New Eng J Stat Data Science* 2024; 1-12.
+#'  - Oron AP, Flournoy N. [Up-and-Down: The Most Popular, Most Reliable, and Most Overlooked Dose-Finding Design.](https://nejsds.nestat.org/journal/NEJSDS/article/86/text) *New Eng J Stat Data Science* 2025; 3:222–233.
 #'  - Oron AP, Hoff PD. The k-in-a-row up-and-down design, revisited. *Stat Med.* 2009;28:1805-1820.
 #'  - Oron AP, Souter MJ, Flournoy N. [Understanding Research Methods: Up-and-down Designs for Dose-finding.](https://journals.lww.com/anesthesiology/fulltext/2022/08000/understanding_research_methods__up_and_down.9.aspx) *Anesthesiology* 2022; 137:137–50. 
 

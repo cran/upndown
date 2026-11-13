@@ -1,7 +1,7 @@
 #  Let's use an 8-dose design, and  a somewhat asymmetric CDF
 
 exampleF = pweibull(1:8, shape = 2, scale = 4)
-# You can plot if you want: plot(exampleF)
+# You can plot if you want: plot(exampleF, pch = 19, cex = 2, ylim = 0:1)
 
 # Here's how the transition matrix looks for the median-finding classic up-and-down
 
@@ -38,9 +38,7 @@ round(kmatMarg(exampleF, k = 6, lowTarget = FALSE), 2)
 #      run the following line:
 
 
-\donttest{
-  round(kmatFull(exampleF, k = 6, lowTarget = FALSE), 2)
-}
+# round(kmatFull(exampleF, k = 6, lowTarget = FALSE), 2)
 
 
 

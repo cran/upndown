@@ -59,7 +59,7 @@ In \code{kmatFull()}, there are two matrix-size options. At one of the boundary 
 #  Let's use an 8-dose design, and  a somewhat asymmetric CDF
 
 exampleF = pweibull(1:8, shape = 2, scale = 4)
-# You can plot if you want: plot(exampleF)
+# You can plot if you want: plot(exampleF, pch = 19, cex = 2, ylim = 0:1)
 
 # Here's how the transition matrix looks for the median-finding classic up-and-down
 
@@ -96,9 +96,7 @@ round(kmatMarg(exampleF, k = 6, lowTarget = FALSE), 2)
 #      run the following line:
 
 
-\donttest{
-  round(kmatFull(exampleF, k = 6, lowTarget = FALSE), 2)
-}
+# round(kmatFull(exampleF, k = 6, lowTarget = FALSE), 2)
 
 
 
@@ -109,7 +107,7 @@ round(kmatMarg(exampleF, k = 6, lowTarget = FALSE), 2)
 \item Durham SD, Flournoy N. Random walks for quantile estimation. In: \emph{Statistical Decision Theory and Related Topics V} (West Lafayette, IN, 1992). Springer; 1994:467-476.
 \item Gezmu M. The Geometric Up-and-Down Design for Allocating Dosage Levels. PhD Thesis. American University; 1996.
 \item Gezmu M, Flournoy N. Group up-and-down designs for dose-finding. \emph{J Stat Plan Inference.} 2006;136(6):1749-1764.
-\item Oron AP, Flournoy N. \href{https://nejsds.nestat.org/journal/NEJSDS/article/86/text}{Up-and-Down: The Most Popular, Most Reliable, and Most Overlooked Dose-Finding Design.} \emph{New Eng J Stat Data Science} 2024; 1-12.
+\item Oron AP, Flournoy N. \href{https://nejsds.nestat.org/journal/NEJSDS/article/86/text}{Up-and-Down: The Most Popular, Most Reliable, and Most Overlooked Dose-Finding Design.} \emph{New Eng J Stat Data Science} 2025; 3:222–233.
 \item Oron AP, Hoff PD. The k-in-a-row up-and-down design, revisited. \emph{Stat Med.} 2009;28:1805-1820.
 \item Oron AP, Souter MJ, Flournoy N. \href{https://journals.lww.com/anesthesiology/fulltext/2022/08000/understanding_research_methods__up_and_down.9.aspx}{Understanding Research Methods: Up-and-down Designs for Dose-finding.} \emph{Anesthesiology} 2022; 137:137–50.
 \item Sada M, Flournoy N, Oron AP, Moler J. The K-in-a-row design as a semi-Markov process. \href{https://academica-e.unavarra.es/entities/publication/e6741a5b-3851-47e0-bb10-927ac48b8dca}{Preprint, University of Navarra.}

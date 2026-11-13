@@ -19,14 +19,14 @@ responses = c( (1 - sign(diff(doses)))/2, 0 )
 op <- par(no.readonly = TRUE)
 
 layout(t(1:2), widths=3:2)
-par(mar=c(4,4,4,1), mgp=c(2.5,0.8,0), cex.axis = 0.7, las = 1)
+par(mar=c(4,4,4,1), mgp=c(2.5,0.8,0), cex.axis = 1, las = 1)
 
 #' The experimental trajectory / time-series / "trace" (pick your favorite name!)
 #' Note the changed argument names for x and y axis titles
-udplot(doses, responses, main='', 
+udplot(doses, responses, main='Trajectory', 
         xtitle = "Patient Number", ytitle = 'Gabapentin (mg/kg)') 
 #' Compare with the article's Figure 1; the line below makes it look more similar
-udplot(doses, responses, shape='square', connect=TRUE)
+# udplot(doses, responses, shape='square', connect=TRUE)
 
 # The dose-response plot, rarely encountered in U&D articles. 
 # We can also add the CIR estimate right there:
@@ -44,18 +44,19 @@ udest(doses, responses, target = 0.5)
 #' They cite a little-known 1991 article by Dixon as the method source.
 #' However, in their author rejoinder they claim to have used the Dixon-Mood estimate.
 #' 
-#' ## Toy example of plotting a group UD dataset
+#' ##### Toy example of plotting a group UD dataset
 #' 
 #' Also showing off some udplot() options
 #' 
 #' Not an actual experiment (made-up data)
 #' The design is purportedly GUD (3,0,1), targeting the 20th percentile
 #' 
-
+layout(1)
 gsize = 3
 x = rep(c(1:3, 2:4), each = gsize)
 y = c(rep(0, 8), 1, rep(0,7), 1, 1)
 
-udplot(x=x, y=y, cohort=gsize, connect=FALSE, shape='triangle')
+udplot(x=x, y=y, cohort=gsize, connect=TRUE, symbsize = 1, 
+       shape='triangle')
 
 par(op) # Back to business as usual ;)
